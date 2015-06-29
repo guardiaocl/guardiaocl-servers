@@ -13,9 +13,17 @@ class Utils:
         self.GENERAL_SECTION = "GENERAL"
         self.ENABLED = "enabled"
 
+    def get_app_dir(self):
+        if not os.path.exists(os.path.join(os.path.expanduser('~'), '.guardiancl/')):
+            os.makedirs(os.path.join(os.path.expanduser('~'), '.guardiancl/'))
+        return os.path.join(os.path.expanduser('~'), '.guardiancl/')
+
+    def get_file(self, file):
+        return os.path.join(self.get_app_dir() + file)
+
     def get_system_config(self):
         config = configparser2.ConfigParser()
-        config.read(os.path.abspath("system.ini"))
+        config.read(self.get_file(".guardiancl.ini"))
         dict_config = dict(config._sections)
         for key in dict_config:
             dict_config[key] = dict(config._defaults, **dict_config[key])
@@ -25,7 +33,7 @@ class Utils:
     def get_config(self):
         if self._config_exist():
             config = configparser2.ConfigParser(delimiters=('='))
-            config.read(os.path.abspath("config.cfg"))
+            config.read(self.get_file(".config.cfg"))
             dict_config = dict(config._sections)
             for key in dict_config:
                 dict_config[key] = dict(config._defaults, **dict_config[key])
@@ -36,7 +44,7 @@ class Utils:
             sys.exit(2)
 
     def _config_exist(self):
-        return os.path.exists('config.cfg')
+        return os.path.exists(self.get_file(".config.cfg"))
 
     def create_config_file(self, configs):
         config = configparser2.ConfigParser(delimiters=('='))
@@ -52,12 +60,12 @@ class Utils:
         for key in configs['general'].keys():
             config.set(self.GENERAL_SECTION, key, configs['general'][key])
 
-        with open(os.path.abspath('config.cfg'), 'w') as configfile:
+        with open(self.get_file(".config.cfg"), 'w') as configfile:
             config.write(configfile)
 
     def create_pid_file(self):
         pid = str(os.getpid())
-        pid_file = os.path.abspath("guardiancloud.pid")
+        pid_file = self.get_file(".guardiancl.pid")
         if os.path.exists(pid_file):
             pid_old = int(open(pid_file).read())
             if psutil.pid_exists(pid_old):
@@ -71,11 +79,11 @@ class Utils:
             target.write(pid)
 
     def remove_pid_file(self):
-        os.unlink(os.path.abspath("guardiancloud.pid"))
+        os.unlink(self.get_file(".guardiancl.pid"))
 
     def alter_config_file(self, configs):
         config = configparser2.ConfigParser(delimiters=('='))
-        config.read(os.path.abspath("config.cfg"))
+        config.read(self.get_file(".config.cfg"))
 
         if 'general' in configs:
             for key in configs['general'].keys():
@@ -87,5 +95,5 @@ class Utils:
             for key in configs['inet'].keys():
                 config.set(self.INET_SECTION, key, configs['inet'][key])
 
-        with open(os.path.abspath('config.cfg'), 'w') as configfile:
+        with open(self.get_file(".config.cfg"), 'w') as configfile:
             config.write(configfile)

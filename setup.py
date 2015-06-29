@@ -8,7 +8,7 @@ if sys.argv[-1] == 'publish':
 
 setup(
     name='guardiancl',
-    version='0.0.4',
+    version='0.0.6',
     description='Computer system information for GuardianCL',
     long_description='guardiancl is a system information for GuardianCL using data mainly served by psutil',
     classifiers=[
@@ -22,7 +22,7 @@ setup(
         'Intended Audience :: System Administrators',
         'Programming Language :: Python :: 2.7'
     ],
-    keywords='guardiancl monitoring web iot',
+    keywords='monitoring web iot',
     author='WeboneSystem',
     author_email='suporte@webonesystem.com.br',
     url='https://github.com/guardiaocl/guardiaocl-servers.git',

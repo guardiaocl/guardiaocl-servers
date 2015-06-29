@@ -7,6 +7,7 @@ import configparser2
 
 import console
 import guardianService
+import utils
 
 
 class GuardianCl(object):
@@ -20,7 +21,8 @@ class GuardianCl(object):
         return app
 
     def _setup_system(self):
-        config_path = os.path.abspath("system.ini")
+        config_dir = utils.Utils().get_app_dir()
+        config_path = os.path.join(config_dir, '.guardiancl.ini')
         if not os.path.exists(config_path):
             config = configparser2.ConfigParser()
             config.add_section('ROUTES')
@@ -32,23 +34,48 @@ class GuardianCl(object):
                 config.write(configfile)
 
     def _setup_logging(self):
-        config_path = os.path.abspath("logging.json")
-        if os.path.exists(config_path):
-            with open(config_path) as f:
-                config = json.load(f)
-            logging.config.dictConfig(config)
+        app_dir = utils.Utils().get_app_dir()
+        config_str = """{
+                "version": 1,
+                "disable_existing_loggers": false,
+                "formatters": {
+                    "file": {
+                        "format": "%(asctime)s :: %(levelname)s :: %(name)s - %(message)s"
+                    }
+                },
+
+                "handlers": {
+                    "file_handler": {
+                        "class": "logging.handlers.RotatingFileHandler",
+                        "level": "DEBUG",
+                        "formatter": "file",
+                        "filename": \""""+app_dir+""".guardiancl.log",
+                        "maxBytes": 10485760,
+                        "backupCount": 3,
+                        "encoding": "utf8"
+                    }
+                },
+
+                "root": {
+                    "level": "DEBUG",
+                    "handlers": ["file_handler"]
+                }
+            }"""
+        logging.config.dictConfig(json.loads(config_str))
 
     def _run_option(self):
         console.clear()
         args = self.app['args']
         if len(args[0:1]) >= 1:
             for opt in args[0:1]:
-                if opt in ['-h','help']:
+                if opt in ['-h', 'help']:
                     self._usage()
                     sys.exit(2)
                 elif opt == "configure":
                     sub_opt = args[1:]
-                    if not os.path.exists('config.cfg'):
+                    config_dir = utils.Utils().get_app_dir()
+                    config_path = os.path.join(config_dir, '.config.cfg')
+                    if not os.path.exists(config_path):
                         guardianService.create_config_file()
                     elif not sub_opt:
                         guardianService.update_config_file()

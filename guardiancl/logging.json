@@ -12,7 +12,7 @@
             "class": "logging.handlers.RotatingFileHandler",
             "level": "DEBUG",
             "formatter": "file",
-            "filename": "system.log",
+            "filename": "guardiancl.log",
             "maxBytes": 10485760,
             "backupCount": 3,
             "encoding": "utf8"

@@ -232,5 +232,3 @@ def update_config_file(type_conf=utils.GENERAL_SECTION):
             new_config['inet'][inet] = inetValue
         utils.alter_config_file(new_config)
         console.info("New config saved...")
-
-
