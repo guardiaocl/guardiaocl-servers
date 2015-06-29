@@ -24,9 +24,9 @@ class GuardianCl(object):
         if not os.path.exists(config_path):
             config = configparser2.ConfigParser()
             config.add_section('ROUTES')
-            config.set('ROUTES', 'auth', 'http://localhost:3000/service/v1/authenticate')
-            config.set('ROUTES', 'devices', 'http://localhost:3000/service/v1/devices')
-            config.set('ROUTES', 'collect', 'http://localhost:3000/collect')
+            config.set('ROUTES', 'auth', 'http://guardiaocloud.com.br/service/v1/authenticate')
+            config.set('ROUTES', 'devices', 'http://guardiaocloud.com.br/service/v1/devices')
+            config.set('ROUTES', 'collect', 'http://guardiaocloud.com.br/collect')
 
             with open(config_path, 'w') as configfile:
                 config.write(configfile)

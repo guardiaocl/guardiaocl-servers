@@ -1,2 +1,4 @@
 *.pyc
 .idea/
+guardiancl.egg-info/
+dist/pip
