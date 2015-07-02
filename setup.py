@@ -8,7 +8,7 @@ if sys.argv[-1] == 'publish':
 
 setup(
     name='guardiancl',
-    version='0.0.7',
+    version='0.0.8',
     description='Computer system information for GuardianCL',
     long_description='guardiancl is a system information for GuardianCL using data mainly served by psutil',
     classifiers=[
