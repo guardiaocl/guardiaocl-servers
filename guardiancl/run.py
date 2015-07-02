@@ -36,33 +36,26 @@ class GuardianCl(object):
     def _setup_logging(self, path_log=None):
         app_dir = os.path.join(path_log or utils.Utils().get_app_dir(), 'guardiancl.log')
         console.log("Log file in '%s'" % app_dir)
-        config_str = """{
-                "version": 1,
-                "disable_existing_loggers": false,
-                "formatters": {
-                    "file": {
-                        "format": "%(asctime)s :: %(levelname)s :: %(name)s - %(message)s"
-                    }
-                },
-
-                "handlers": {
-                    "file_handler": {
-                        "class": "logging.handlers.RotatingFileHandler",
-                        "level": "DEBUG",
-                        "formatter": "file",
-                        "filename": \""""+app_dir+"""",
-                        "maxBytes": 10485760,
-                        "backupCount": 3,
-                        "encoding": "utf8"
-                    }
-                },
-
-                "root": {
+        logging.config.dictConfig({
+            "version": 1,
+            "disable_existing_loggers": False,
+            "formatters":
+                {"file": {"format": "%(asctime)s :: %(levelname)s :: %(name)s - %(message)s"}},
+            "handlers": {
+                "file_handler": {
+                    "class": "logging.handlers.RotatingFileHandler",
+                    "level": "DEBUG",
+                    "formatter": "file",
+                    "filename": str(app_dir),
+                    "maxBytes": 10485760,
+                    "backupCount": 3,
+                    "encoding": "utf8"
+                }},
+            "root": {
                     "level": "DEBUG",
                     "handlers": ["file_handler"]
                 }
-            }"""
-        logging.config.dictConfig(json.loads(config_str))
+        })
 
     def _run_option(self):
         console.clear()
