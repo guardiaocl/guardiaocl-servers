@@ -65,7 +65,7 @@ class Utils:
 
     def create_pid_file(self):
         pid = str(os.getpid())
-        pid_file = self.get_file(".guardiancl.pid")
+        pid_file = self.get_file("guardiancl.pid")
         if os.path.exists(pid_file):
             pid_old = int(open(pid_file).read())
             if psutil.pid_exists(pid_old):
@@ -79,7 +79,7 @@ class Utils:
             target.write(pid)
 
     def remove_pid_file(self):
-        os.unlink(self.get_file(".guardiancl.pid"))
+        os.unlink(self.get_file("guardiancl.pid"))
 
     def alter_config_file(self, configs):
         config = configparser2.ConfigParser(delimiters=('='))

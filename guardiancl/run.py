@@ -33,8 +33,9 @@ class GuardianCl(object):
             with open(config_path, 'w') as configfile:
                 config.write(configfile)
 
-    def _setup_logging(self):
-        app_dir = utils.Utils().get_app_dir()
+    def _setup_logging(self, path_log=None):
+        app_dir = os.path.join(path_log or utils.Utils().get_app_dir(), 'guardiancl.log')
+        console.log("Log file in '%s'" % app_dir)
         config_str = """{
                 "version": 1,
                 "disable_existing_loggers": false,
@@ -49,7 +50,7 @@ class GuardianCl(object):
                         "class": "logging.handlers.RotatingFileHandler",
                         "level": "DEBUG",
                         "formatter": "file",
-                        "filename": \""""+app_dir+""".guardiancl.log",
+                        "filename": \""""+app_dir+"""",
                         "maxBytes": 10485760,
                         "backupCount": 3,
                         "encoding": "utf8"
@@ -96,6 +97,10 @@ class GuardianCl(object):
                     else:
                         self._usage()
                 elif opt == "monitor":
+                    sub_opt = args[1:]
+                    if len(sub_opt) == 2:
+                        if sub_opt[0] == '-p' and sub_opt[1]:
+                            self._setup_logging(sub_opt[1])
                     guardianService.start_monitor()
                 else:
                     self._usage()
@@ -103,7 +108,7 @@ class GuardianCl(object):
             self._usage()
 
     def _usage(self):
-        print('  Usage: python run.py [command]'
+        print('  Usage: guardiancl [command]'
               '\n\n  Commands:'
               '\n\n    configure [ disk | inet ]         |  config client'
               '\n    monitor                           |  start monitoring'

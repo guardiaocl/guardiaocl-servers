@@ -17,10 +17,10 @@ utils = Utils()
 system_config = utils.get_system_config()
 sched = BlockingScheduler()
 
-def authenticate():
-    serial = raw_input("Serial:")
-    email = raw_input("E-mail:")
-    password = getpass.getpass("Password:")
+def authenticate(serial=None, email=None, password=None):
+    serial = raw_input("Serial:") if not serial else serial
+    email = raw_input("E-mail:") if not email else email
+    password = getpass.getpass("Password:") if not password else password
 
     if not serial or not email or not password:
         console.info("Serial, E-mail or Password Invalid!")
@@ -72,6 +72,7 @@ def list_configs(opt):
 
 def start_monitor():
     console.info("Starting guardiancl monitor...", True)
+    config = utils.get_config()
     http = urllib3.PoolManager()
     utils.create_pid_file()
 
@@ -143,7 +144,7 @@ def start_monitor():
             console.error(data['status'])
 
     console.info("Sending informations...")
-    sched.add_job(collect_job, 'interval', max_instances=1, seconds=5)
+    sched.add_job(collect_job, 'interval', max_instances=1, seconds=int(config[utils.GENERAL_SECTION].get('refresh_time')))
 
     try:
         sched.start()
@@ -180,7 +181,7 @@ def generate_config_file(account, device):
         net = dict([(net, "enabled") for idx, net in
                         enumerate(psutil.net_io_counters(pernic=True).keys())])
         general = {'email': account.email, 'user_key': account.user_key, 'serial': device.serial,
-                       'api_key': account.api_key}
+                       'api_key': account.api_key, 'refresh_time': '5'}
         configs = {'disks': disks, 'net': net, 'general': general}
         utils.create_config_file(configs)
         console.info("Config file created...")
@@ -192,18 +193,24 @@ def update_config_file(type_conf=utils.GENERAL_SECTION):
     config = utils.get_config()
     if type_conf == utils.GENERAL_SECTION:
         serial_conf = config[utils.GENERAL_SECTION].get('serial')
-        user_key_conf = config[utils.GENERAL_SECTION].get('user_key')
-        api_key_conf = config[utils.GENERAL_SECTION].get('api_key')
+        refresh_time_conf = config[utils.GENERAL_SECTION].get('refresh_time')
         email_conf = config[utils.GENERAL_SECTION].get('email')
 
         serial = raw_input("Serial  [%s]: " % serial_conf) or serial_conf
-        user_key = raw_input("UserKey [%s]: " % user_key_conf) or user_key_conf
-        api_key = raw_input("ApiKey  [%s]: " % api_key_conf) or api_key_conf
+        refresh_time = raw_input("Refresh Time(seconds) [%s]: " % refresh_time_conf) or refresh_time_conf
+        while refresh_time < 5:
+            console.log("The time needs to be >= 5 seconds...")
+            refresh_time = raw_input("Refresh Time(seconds) [%s]: " % refresh_time_conf) or refresh_time_conf
         email = raw_input("Email   [%s]: " % email_conf) or email_conf
 
-        utils.alter_config_file({'general': {'serial': serial, 'user_key': user_key,
-                                             'api_key': api_key, 'email': email}})
-        console.info("New config saved...")
+        if email != email_conf:
+            password = getpass.getpass("Password:")
+            if authenticate(serial, email, password):
+                utils.alter_config_file({'general': {'serial': serial, 'email': email, 'refresh_time': refresh_time}})
+                console.info("New config saved...")
+        else:
+            utils.alter_config_file({'general': {'serial': serial, 'email': email, 'refresh_time': refresh_time}})
+            console.info("New config saved...")
     elif type_conf == utils.DISK_SECTION:
         new_config = {'disk': {}}
         console.log("Type: y - 'enable' or n - 'disabled'")
