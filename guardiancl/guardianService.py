@@ -105,7 +105,7 @@ def start_monitor():
                 report['arch'] = platform.architecture()[0]
 
         for disk in disks.keys():
-            if disks[disk] == utils.ENABLED:
+            if disks[disk] == utils.ENABLED and check_disk(disk):
                 usage_temp = psutil.disk_usage(disk)
                 usage[disk] = {'total': usage_temp.total, 'used': usage_temp.used, 'free': usage_temp.free,
                                'percentage': usage_temp.percent}
@@ -151,6 +151,12 @@ def start_monitor():
     except (KeyboardInterrupt, SystemExit):
         utils.remove_pid_file()
         pass
+
+def check_disk(disk):
+    disks_temp = []
+    for part in psutil.disk_partitions(all=False):
+            disks_temp.append(part.mountpoint)
+    return disk in disks_temp
 
 def get_devices(account):
     http = urllib3.PoolManager()
