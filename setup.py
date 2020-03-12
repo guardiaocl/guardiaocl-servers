@@ -32,7 +32,7 @@ setup(
     zip_safe=False,
     install_requires=[
         'APScheduler==3.0.3',
-        'psutil==3.0.1',
+        'psutil==5.6.6',
         'configparser2==4.0.0'
     ],
     entry_points={
